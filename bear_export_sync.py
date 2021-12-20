@@ -113,7 +113,7 @@ assets_path = parsed_args.get("images") if parsed_args.get("images") else os.pat
 
 bear_files_path = os.path.join(HOME,
     'Library/Group Containers/9K33E3U3T4.net.shinyfrog.bear/Application Data/Local Files/Note Files')
-attachments_path = parsed_args.get("attachements") if parsed_args.get("attachements") else os.path.join(export_path, 'BearAttachments')
+attachments_path = parsed_args.get("attachments") if parsed_args.get("attachments") else os.path.join(export_path, 'BearAttachments')
 
 sync_ts = '.sync-time.log'
 export_ts = '.export-time.log'
@@ -189,7 +189,7 @@ def export_markdown():
             md_text += '\n\n<!-- {BearID:' + uuid + '} -->\n'
             for filepath in file_list:
                 note_count += 1
-                # print(filepath)
+                #print(filepath)
                 if export_as_textbundles:
                     if check_image_hybrid(md_text):
                         make_text_bundle(md_text, filepath, mod_dt)                        
@@ -311,7 +311,10 @@ def process_image_links(md_text, filepath):
     root = filepath.replace(temp_path, '')
     level = len(root.split('/')) - 2
     parent = '../' * level
-    md_text = re.sub(r'\[image:(.+?)\]', r'![](' + parent + r'BearImages/\1)', md_text)
+    if parsed_args.get("images"):
+      md_text = re.sub(r'\[image:(.+?)\]', r'![](<file:///' + parsed_args.get("images") + r'/\1>)', md_text)
+    else:
+      md_text = re.sub(r'\[image:(.+?)\]', r'![](' + parent + r'BearImages/\1)', md_text)
     return md_text
 
 
@@ -322,7 +325,10 @@ def process_attachments_links(md_text, filepath):
     root = filepath.replace(temp_path, '')
     level = len(root.split('/')) - 2
     parent = '../' * level
-    md_text = re.sub(r'\[file:([^/]+?)\/(.+?)\]', r'[\2](' + parent + r'BearAttachments/\1/\2)', md_text)
+    if parsed_args.get("attachments"):
+      md_text = re.sub(r'\[file:([^/]+?)\/(.+?)\]', r'[\2](<file:///' + parsed_args.get("attachments") + r'/\1/\2>)', md_text)
+    else:
+      md_text = re.sub(r'\[file:([^/]+?)\/(.+?)\]', r'[\2](' + parent + r'BearAttachments/\1/\2)', md_text)
     return md_text
 
 def restore_image_links(md_text):
